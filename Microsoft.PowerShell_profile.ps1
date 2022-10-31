@@ -91,7 +91,7 @@ Set-Alias -Name sudo -Value admin
 # Make it easy to edit this profile once it's installed
 function Edit-Profile
 {
-    code $profile.CurrentUserAllHosts
+    code $profile
 }
 
 # We don't need these any more; they were just temporary variables to get to $isAdmin. 
@@ -113,8 +113,10 @@ Function Test-CommandExists
 #
 function ll { Get-ChildItem -Path $pwd -File }
 Function Get-PubIP {
- (Invoke-WebRequest http://ifconfig.me/ip ).Content
+        $myIp = ( Invoke-WebRequest http://ifconfig.me/ip ).Content
+        "My public ip is: $myIp"
 }
+Set-Alias -Name whatsmyip -Value Get-PubIP
 function uptime {
         Get-WmiObject win32_operatingsystem | Select-Object csname, @{LABEL='LastBootUpTime';
         EXPRESSION={$_.ConverttoDateTime($_.lastbootuptime)}}
