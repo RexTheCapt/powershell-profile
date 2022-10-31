@@ -30,19 +30,7 @@ function sha1   { Get-FileHash -Algorithm SHA1 $args }
 function sha256 { Get-FileHash -Algorithm SHA256 $args }
 
 # Quick shortcut to start notepad
-function n      { notepad $args }
-
-# Drive shortcuts
-function HKLM:  { Set-Location HKLM: }
-function HKCU:  { Set-Location HKCU: }
-function Env:   { Set-Location Env: }
-
-# Creates drive shortcut for Work Folders, if current user account is using it
-if (Test-Path "$env:USERPROFILE\Work Folders")
-{
-    New-PSDrive -Name Work -PSProvider FileSystem -Root "$env:USERPROFILE\Work Folders" -Description "Work Folders"
-    function Work: { Set-Location Work: }
-}
+function c      { code $args }
 
 # Set up command prompt and window title. Use UNIX-style convention for identifying 
 # whether user is elevated (root) or not. Window title shows current version of PowerShell
@@ -103,14 +91,7 @@ Set-Alias -Name sudo -Value admin
 # Make it easy to edit this profile once it's installed
 function Edit-Profile
 {
-    if ($host.Name -match "ise")
-    {
-        $psISE.CurrentPowerShellTab.Files.Add($profile.CurrentUserAllHosts)
-    }
-    else
-    {
-        notepad $profile.CurrentUserAllHosts
-    }
+    code $profile.CurrentUserAllHosts
 }
 
 # We don't need these any more; they were just temporary variables to get to $isAdmin. 
@@ -130,31 +111,7 @@ Function Test-CommandExists
 #
 # Aliases
 #
-if (Test-CommandExists nvim) {
-    $EDITOR='nvim'
-} elseif (Test-CommandExists pvim) {
-    $EDITOR='pvim'
-} elseif (Test-CommandExists vim) {
-    $EDITOR='vim'
-} elseif (Test-CommandExists vi) {
-    $EDITOR='vi'
-}
-Set-Alias -Name vim -Value $EDITOR
-
-
 function ll { Get-ChildItem -Path $pwd -File }
-function g { Set-Location $HOME\Documents\Github }
-function gcom
-{
-	git add .
-	git commit -m "$args"
-}
-function lazyg
-{
-	git add .
-	git commit -m "$args"
-	git push
-}
 Function Get-PubIP {
  (Invoke-WebRequest http://ifconfig.me/ip ).Content
 }
@@ -170,11 +127,6 @@ function find-file($name) {
                 $place_path = $_.directory
                 Write-Output "${place_path}\${_}"
         }
-}
-function unzip ($file) {
-        Write-Output("Extracting", $file, "to", $pwd)
-	$fullFile = Get-ChildItem -Path $pwd -Filter .\cove.zip | ForEach-Object{$_.FullName}
-        Expand-Archive -Path $fullFile -DestinationPath $pwd
 }
 function grep($regex, $dir) {
         if ( $dir ) {
@@ -208,13 +160,3 @@ function pgrep($name) {
 
 ## Final Line to set prompt
 oh-my-posh --init --shell pwsh --config ~/jandedobbeleer.omp.json | Invoke-Expression
-
-# Import the Chocolatey Profile that contains the necessary code to enable
-# tab-completions to function for `choco`.
-# Be aware that if you are missing these lines from your profile, tab completion
-# for `choco` will not function.
-# See https://ch0.co/tab-completion for details.
-$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-if (Test-Path($ChocolateyProfile)) {
-  Import-Module "$ChocolateyProfile"
-}
