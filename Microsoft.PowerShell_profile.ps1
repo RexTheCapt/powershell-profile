@@ -167,4 +167,6 @@ function pgrep($name) {
 
 
 ## Final Line to set prompt
-oh-my-posh --init --shell pwsh --config ~/jandedobbeleer.omp.json | Invoke-Expression
+if (Test-CommandExists oh-my-psh) {
+    oh-my-posh --init --shell pwsh --config ~/jandedobbeleer.omp.json | Invoke-Expression
+}
