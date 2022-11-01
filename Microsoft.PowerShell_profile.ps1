@@ -21,49 +21,42 @@ $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administ
 # If so and the current host is a command line, then change to red color 
 # as warning to user that they are operating in an elevated context
 # Useful shortcuts for traversing directories
-function cd...  { Set-Location ..\.. }
+function cd... { Set-Location ..\.. }
 function cd.... { Set-Location ..\..\.. }
-function cddesktop { Set-Location "$env:USERPROFILE\Desktop\"}
+function cddesktop { Set-Location "$env:USERPROFILE\Desktop\" }
 
 
 # Compute file hashes - useful for checking successful downloads 
-function md5    { Get-FileHash -Algorithm MD5 $args }
-function sha1   { Get-FileHash -Algorithm SHA1 $args }
+function md5 { Get-FileHash -Algorithm MD5 $args }
+function sha1 { Get-FileHash -Algorithm SHA1 $args }
 function sha256 { Get-FileHash -Algorithm SHA256 $args }
 
 # Quick shortcut to start notepad
-function c      { code $args }
+function c { code $args }
 
 # Set up command prompt and window title. Use UNIX-style convention for identifying 
 # whether user is elevated (root) or not. Window title shows current version of PowerShell
 # and appends [ADMIN] if appropriate for easy taskbar identification
-function prompt 
-{ 
-    if ($isAdmin) 
-    {
+function prompt { 
+    if ($isAdmin) {
         "[" + (Get-Location) + "] # " 
     }
-    else 
-    {
+    else {
         "[" + (Get-Location) + "] $ "
     }
 }
 
 $Host.UI.RawUI.WindowTitle = "PowerShell {0}" -f $PSVersionTable.PSVersion.ToString()
-if ($isAdmin)
-{
+if ($isAdmin) {
     $Host.UI.RawUI.WindowTitle += " [ADMIN]"
 }
 
 # Does the the rough equivalent of dir /s /b. For example, dirs *.png is dir /s /b *.png
-function dirs
-{
-    if ($args.Count -gt 0)
-    {
+function dirs {
+    if ($args.Count -gt 0) {
         Get-ChildItem -Recurse -Include "$args" | Foreach-Object FullName
     }
-    else
-    {
+    else {
         Get-ChildItem -Recurse | Foreach-Object FullName
     }
 }
@@ -71,16 +64,13 @@ function dirs
 # Simple function to start a new elevated process. If arguments are supplied then 
 # a single command is started with admin rights; if not then a new admin instance
 # of PowerShell is started.
-function admin
-{
-    if ($args.Count -gt 0)
-    {   
-       $argList = "& '" + $args + "'"
-       Start-Process "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -Verb runAs -ArgumentList $argList
+function admin {
+    if ($args.Count -gt 0) {   
+        $argList = "& '" + $args + "'"
+        Start-Process "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -Verb runAs -ArgumentList $argList
     }
-    else
-    {
-       Start-Process "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -Verb runAs -WorkingDirectory "$(Get-Location)"
+    else {
+        Start-Process "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -Verb runAs -WorkingDirectory "$(Get-Location)"
     }
 }
 
@@ -90,10 +80,27 @@ Set-Alias -Name su -Value admin
 Set-Alias -Name sudo -Value admin
 
 
-# Make it easy to edit this profile once it's installed
-function Edit-Profile
-{
-    code $profile
+# Commands to handle the profle
+function Edit-Profile {
+    param (
+        [Parameter()]
+        [ValidateSet("Code","Notepad")]
+        $program = "Code"
+    )
+
+    Start-Process $program -ArgumentList $PROFILE
+    # $program $PROFILE
+}
+# function Edit-Profile {
+#     param
+#     code $profile
+# }
+function reload-profile {
+    & $profile
+}
+function update-profile {
+    irm "https://github.com/RexTheCapt/powershell-profile/raw/main/setup.ps1" | iex
+    reload-profile
 }
 
 # We don't need these any more; they were just temporary variables to get to $isAdmin. 
@@ -101,64 +108,61 @@ function Edit-Profile
 Remove-Variable identity
 Remove-Variable principal
 
-Function Test-CommandExists
-{
- Param ($command)
- $oldPreference = $ErrorActionPreference
- $ErrorActionPreference = 'SilentlyContinue'
- try {if(Get-Command $command){RETURN $true}}
- Catch {Write-Host "$command does not exist"; RETURN $false}
- Finally {$ErrorActionPreference=$oldPreference}
+Function Test-CommandExists {
+    Param ($command)
+    $oldPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'SilentlyContinue'
+    try { if (Get-Command $command) { RETURN $true } }
+    Catch { Write-Host "$command does not exist"; RETURN $false }
+    Finally { $ErrorActionPreference = $oldPreference }
 } 
 #
 # Aliases
 #
 function ll { Get-ChildItem -Path $pwd -File }
 Function Get-PubIP {
-        $myIp = ( Invoke-WebRequest http://ifconfig.me/ip ).Content
-        "My public ip is: $myIp"
+    $myIp = ( Invoke-WebRequest http://ifconfig.me/ip ).Content
+    "My public ip is: $myIp"
 }
 Set-Alias -Name whatsmyip -Value Get-PubIP
 function uptime {
-        Get-WmiObject win32_operatingsystem | Select-Object csname, @{LABEL='LastBootUpTime';
-        EXPRESSION={$_.ConverttoDateTime($_.lastbootuptime)}}
-}
-function reload-profile {
-        & $profile
+    Get-WmiObject win32_operatingsystem | Select-Object csname, @{LABEL = 'LastBootUpTime';
+        EXPRESSION                                                      = { $_.ConverttoDateTime($_.lastbootuptime) }
+    }
 }
 function find-file($name) {
-        Get-ChildItem -recurse -filter "*${name}*" -ErrorAction SilentlyContinue | ForEach-Object {
-                $place_path = $_.directory
-                Write-Output "${place_path}\${_}"
-        }
+    Get-ChildItem -recurse -filter "*${name}*" -ErrorAction SilentlyContinue | ForEach-Object {
+        $place_path = $_.directory
+        Write-Output "${place_path}\${_}"
+    }
 }
 function grep($regex, $dir) {
-        if ( $dir ) {
-                Get-ChildItem $dir | select-string $regex
-                return
-        }
-        $input | select-string $regex
+    if ( $dir ) {
+        Get-ChildItem $dir | select-string $regex
+        return
+    }
+    $input | select-string $regex
 }
 function touch($file) {
-        "" | Out-File $file -Encoding ASCII
+    "" | Out-File $file -Encoding ASCII
 }
 function df {
-        get-volume
+    get-volume
 }
-function sed($file, $find, $replace){
+function sed($file, $find, $replace) {
         (Get-Content $file).replace("$find", $replace) | Set-Content $file
 }
 function which($name) {
-        Get-Command $name | Select-Object -ExpandProperty Definition
+    Get-Command $name | Select-Object -ExpandProperty Definition
 }
 function export($name, $value) {
-        set-item -force -path "env:$name" -value $value;
+    set-item -force -path "env:$name" -value $value;
 }
 function pkill($name) {
-        Get-Process $name -ErrorAction SilentlyContinue | Stop-Process
+    Get-Process $name -ErrorAction SilentlyContinue | Stop-Process
 }
 function pgrep($name) {
-        Get-Process $name
+    Get-Process $name
 }
 
 
