@@ -30,8 +30,8 @@ $confChoices = "&Yes", "&No"
 $conf = $host.ui.PromptForChoice($confTitle, $confQuestion, $confChoices, 1)
 
 switch ($conf) {
-    0 {
-        
+    0 {  }
+    1 {
         # OMP Install
         #
         winget install -e --accept-source-agreements --accept-package-agreements JanDeDobbeleer.OhMyPosh
@@ -39,7 +39,6 @@ switch ($conf) {
         # Font Install
         Invoke-RestMethod https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/CascadiaCode.zip?WT.mc_id=-blog-scottha -o cove.zip
     }
-    1 {  }
     Default {  }
 }
 
