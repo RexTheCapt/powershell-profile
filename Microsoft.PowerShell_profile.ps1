@@ -78,7 +78,7 @@ function admin
     }
     else
     {
-       Start-Process "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -Verb runAs -WorkingDirectory $(Get-Location)
+       Start-Process "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -Verb runAs -WorkingDirectory "$(Get-Location)"
     }
 }
 
