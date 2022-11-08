@@ -161,10 +161,43 @@ function export($name, $value) {
 function pkill($name) {
     Get-Process $name -ErrorAction SilentlyContinue | Stop-Process
 }
-function pgrep($name) {
-    Get-Process $name
+function pgrep {
+    param (
+        [parameter(Mandatory=$True)]
+        $name,
+        [parameter(Mandatory=$False)]
+        [ValidateSet("Process", "Install")]
+        $type = "Process"
+    )
+
+    if ($type -eq "Process") {
+        Get-Process $name
+    } elseif ($type -eq "Install") {
+      
+        Get-WmiObject Win32_Product | Where-Object {$_.Name -like "*$name*"} | Select-Object Name, IdentifyingNumber
+        
+        # $InstalledSoftware = Get-ChildItem "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall"
+        # foreach ($obj in $InstalledSoftware) {
+        #     write-host $obj.GetValue('DisplayName') -NoNewline
+        #     write-host " - " -NoNewline
+        #     write-host $obj.GetValue('DisplayVersion')
+        #     # write-host $obj.GetValue('IdentifyingNumber')
+        # }
+
+        # Get-WmiObject -Class Win32_Product
+        # Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Select-Object DisplayName, DisplayVersion, Publisher, InstallDate | Format-Table -AutoSize
+    }
 }
 Set-Alias -Name pget -Value pgrep
+function puninstall {
+    param (
+    [Parameter(Mandatory=$True)]    
+    $name
+    )
+    
+    $MyApp = Get-WmiObject -Class Win32_Product | Where-Object{$_.Name -eq "$name"}
+    $MyApp.name
+}
 
 ## Final Line to set prompt
 if (Test-CommandExists oh-my-psh) {
