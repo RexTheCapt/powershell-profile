@@ -1,5 +1,3 @@
-$psprofileversion = "Dev v1"
-
 #If the file does not exist, create it.
 if (-not(Test-Path -Path $PROFILE -PathType Leaf)) {
     try {
