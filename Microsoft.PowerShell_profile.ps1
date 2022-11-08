@@ -164,7 +164,7 @@ function pkill($name) {
 function pgrep($name) {
     Get-Process $name
 }
-
+Set-Alias -Name pget -Value pgrep
 
 ## Final Line to set prompt
 if (Test-CommandExists oh-my-psh) {
