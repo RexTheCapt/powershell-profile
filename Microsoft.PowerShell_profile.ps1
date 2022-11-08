@@ -17,7 +17,7 @@
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
 $principal = New-Object Security.Principal.WindowsPrincipal $identity
 $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-$psprofileversion = "Dev v1"
+$psprofileversion = "Dev v1.1"
 
 # If so and the current host is a command line, then change to red color 
 # as warning to user that they are operating in an elevated context
@@ -170,6 +170,8 @@ function pgrep {
         [ValidateSet("Process", "Install")]
         $type = "Process"
     )
+
+    Write-Host "name: $name, type: $type"
 
     if ($type -eq "Process") {
         Get-Process $name
