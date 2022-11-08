@@ -100,7 +100,7 @@ function reload-profile {
     & $profile
 }
 function update-profile {
-    irm "https://github.com/RexTheCapt/powershell-profile/raw/main/setup.ps1" | iex
+    irm "https://github.com/RexTheCapt/powershell-profile/raw/dev/setup.ps1" | iex
     reload-profile
 }
 
