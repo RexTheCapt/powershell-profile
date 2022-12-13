@@ -23,7 +23,7 @@ $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administ
 # Useful shortcuts for traversing directories
 function cd... { Set-Location ..\.. }
 function cd.... { Set-Location ..\..\.. }
-function cddesktop { Set-Location "$env:USERPROFILE\Desktop\" }
+function cddesktop { Set-Location [Environment]::GetFolderPath("Desktop") }
 
 
 # Compute file hashes - useful for checking successful downloads 
