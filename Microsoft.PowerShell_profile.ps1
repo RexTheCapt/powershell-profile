@@ -85,16 +85,27 @@ function Edit-Profile {
     param (
         [Parameter()]
         [ValidateSet("Code","Notepad")]
-        $program = "Code"
+        $program = "Code",
+        [parameter()]
+        [ValidateSet("Primary", "Secondary")]
+        $type = "Primary"
     )
 
-    Start-Process $program -ArgumentList $PROFILE
+    $curprof = ""
+
+    switch ($type) {
+        "Primary" { $curprof = $PROFILE }
+        "Secondary" { $curprof = "$(Split-Path -Parent $PROFILE)\local.ps1"}
+        Default {}
+    }
+
+    if (!(Test-Path $curprof)){
+        New-Item -Path $curprof -ItemType File
+    }
+
+    Start-Process $program -ArgumentList $curprof
     # $program $PROFILE
 }
-# function Edit-Profile {
-#     param
-#     code $profile
-# }
 function reload-profile {
     & $profile
 }
@@ -169,4 +180,8 @@ function pgrep($name) {
 ## Final Line to set prompt
 if (Test-CommandExists oh-my-psh) {
     oh-my-posh --init --shell pwsh --config ~/jandedobbeleer.omp.json | Invoke-Expression
+}
+
+if (Test-Path "$(Split-Path -Parent $PROFILE)\local.ps1"){
+    . "$(Split-Path -Parent $PROFILE)\local.ps1"
 }
